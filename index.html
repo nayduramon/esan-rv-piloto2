@@ -17,6 +17,7 @@
 
     <a-sky src="#esan360" rotation="0 -90 0"></a-sky>
 
+    <!-- TELÓN NEGRO -->
     <a-sphere
       id="telonNegro"
       radius="60"
@@ -25,6 +26,37 @@
       animation__aclarar="property: material.opacity; to: 0; dur: 3000; startEvents: cineEnd; easing: easeInOutQuad">
     </a-sphere>
 
+    <!-- ⭐ ESTRELLAS (SOLO SE VEN EN FONDO NEGRO) -->
+    <a-entity
+      id="estrellas"
+      visible="false"
+      animation__mostrar="property: visible; to: true; startEvents: cineStart"
+      animation__ocultar="property: visible; to: false; startEvents: cineEnd">
+
+      <!-- Estrellas -->
+      <a-sphere radius="0.12" position="10 15 -30" material="color: #ffffff; shader: flat"
+        animation="property: material.opacity; from: 0.3; to: 1; dur: 1200; dir: alternate; loop: true">
+      </a-sphere>
+
+      <a-sphere radius="0.08" position="-12 8 -25" material="color: #ffffff; shader: flat"
+        animation="property: material.opacity; from: 0.2; to: 0.9; dur: 900; dir: alternate; loop: true">
+      </a-sphere>
+
+      <a-sphere radius="0.1" position="5 -6 -28" material="color: #ffffff; shader: flat"
+        animation="property: material.opacity; from: 0.4; to: 1; dur: 1500; dir: alternate; loop: true">
+      </a-sphere>
+
+      <a-sphere radius="0.07" position="-6 -10 -22" material="color: #ffffff; shader: flat"
+        animation="property: material.opacity; from: 0.3; to: 0.8; dur: 1000; dir: alternate; loop: true">
+      </a-sphere>
+
+      <a-sphere radius="0.09" position="14 -4 -26" material="color: #ffffff; shader: flat"
+        animation="property: material.opacity; from: 0.2; to: 1; dur: 1800; dir: alternate; loop: true">
+      </a-sphere>
+
+    </a-entity>
+
+    <!-- VIDEO -->
     <a-video
       id="pantallaVideo"
       src="#videoUni"
@@ -36,6 +68,7 @@
       animation__salir="property: position; to: 0 1.6 -30; dur: 4000; easing: easeInQuad; startEvents: videoSale">
     </a-video>
 
+    <!-- BOTÓN -->
     <a-entity
       id="contenedorBoton"
       position="0 1.6 -15"
@@ -66,6 +99,7 @@
       </a-circle>
     </a-entity>
 
+    <!-- CÁMARA -->
     <a-entity camera look-controls position="0 1.6 0">
       <a-cursor
         id="cursor"
@@ -79,6 +113,7 @@
 
   </a-scene>
 
+  <!-- SCRIPT ORIGINAL (SIN CAMBIOS) -->
   <script>
     const video = document.querySelector('#videoUni');
     const pantalla = document.querySelector('#pantallaVideo');
@@ -87,10 +122,9 @@
     const textoBoton = document.querySelector('#textoBoton');
     const telonNegro = document.querySelector('#telonNegro');
 
-    // Configuración de la animación del botón (para reusarla)
-    const animacionBotonConfig = "property: position; to: 0 1.6 -2.5; dur: 8000; easing: easeOutCubic; delay: 500";
+    const animacionBotonConfig =
+      "property: position; to: 0 1.6 -2.5; dur: 8000; easing: easeOutCubic; delay: 500";
 
-    // --- CLIC EN BOTÓN ---
     btnAccion.addEventListener('click', function() {
       contenedorBtn.setAttribute('visible', 'false');
       telonNegro.emit('cineStart');
@@ -104,35 +138,27 @@
       }, 1000);
     });
 
-    // --- FIN DEL VIDEO (CORREGIDO) ---
     video.addEventListener('ended', function() {
       telonNegro.emit('cineEnd');
       pantalla.emit('videoSale');
 
-      // Esperamos a que el video se aleje
       setTimeout(() => {
         pantalla.setAttribute('visible', 'false');
-
-        // 1. Cambiar Texto
         textoBoton.setAttribute('value', 'VUELVE A VER\nNUESTRA\nHISTORIA');
-
-        // 2. Hacer visible el contenedor
         contenedorBtn.setAttribute('visible', 'true');
-
-        // 3. REINICIO ROBUSTO DE LA ANIMACIÓN:
         contenedorBtn.setAttribute('position', '0 1.6 -15');
         contenedorBtn.removeAttribute('animation');
 
         setTimeout(() => {
           contenedorBtn.setAttribute('animation', animacionBotonConfig);
         }, 50);
-
       }, 4000);
     });
   </script>
 
 </body>
 </html>
+
 
 
 
