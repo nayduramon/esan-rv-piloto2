@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <title>ESAN 360 - Trayectoria histórica</title>
+
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aframe-particle-system-component@1.1.3/dist/aframe-particle-system-component.min.js"></script>
 </head>
 
 <body>
@@ -17,6 +19,7 @@
 
     <a-sky src="#esan360" rotation="0 -90 0"></a-sky>
 
+    <!-- TELÓN NEGRO -->
     <a-sphere
       id="telonNegro"
       radius="60"
@@ -25,6 +28,24 @@
       animation__aclarar="property: material.opacity; to: 0; dur: 3000; startEvents: cineEnd; easing: easeInOutQuad">
     </a-sphere>
 
+    <!-- ⭐ ESTRELLAS -->
+    <a-entity
+      id="estrellas"
+      visible="false"
+      particle-system="
+        preset: default;
+        particleCount: 1200;
+        color: #FFFFFF;
+        size: 0.6;
+        opacity: 0.9;
+        velocityValue: 0 0 -0.05;
+        accelerationValue: 0 0 0;
+        maxAge: 12;
+        blending: additive;
+      ">
+    </a-entity>
+
+    <!-- VIDEO -->
     <a-video
       id="pantallaVideo"
       src="#videoUni"
@@ -36,6 +57,7 @@
       animation__salir="property: position; to: 0 1.6 -30; dur: 4000; easing: easeInQuad; startEvents: videoSale">
     </a-video>
 
+    <!-- BOTÓN -->
     <a-entity
       id="contenedorBoton"
       position="0 1.6 -15"
@@ -66,6 +88,7 @@
       </a-circle>
     </a-entity>
 
+    <!-- CÁMARA -->
     <a-entity camera look-controls position="0 1.6 0">
       <a-cursor
         id="cursor"
@@ -86,16 +109,21 @@
     const btnAccion = document.querySelector('#btnAccion');
     const textoBoton = document.querySelector('#textoBoton');
     const telonNegro = document.querySelector('#telonNegro');
+    const estrellas = document.querySelector('#estrellas');
 
-    // Configuración de la animación del botón (para reusarla)
-    const animacionBotonConfig = "property: position; to: 0 1.6 -2.5; dur: 8000; easing: easeOutCubic; delay: 500";
+    const animacionBotonConfig =
+      "property: position; to: 0 1.6 -2.5; dur: 8000; easing: easeOutCubic; delay: 500";
 
     // --- CLIC EN BOTÓN ---
     btnAccion.addEventListener('click', function() {
       contenedorBtn.setAttribute('visible', 'false');
+
       telonNegro.emit('cineStart');
+      estrellas.setAttribute('visible', 'true');
+
       video.muted = false;
       video.currentTime = 0;
+
       pantalla.setAttribute('visible', 'true');
       pantalla.emit('videoEntra');
 
@@ -104,22 +132,22 @@
       }, 1000);
     });
 
-    // --- FIN DEL VIDEO (CORREGIDO) ---
+    // --- FIN DEL VIDEO ---
     video.addEventListener('ended', function() {
       telonNegro.emit('cineEnd');
+      estrellas.setAttribute('visible', 'false');
+
       pantalla.emit('videoSale');
 
-      // Esperamos a que el video se aleje
       setTimeout(() => {
         pantalla.setAttribute('visible', 'false');
 
-        // 1. Cambiar Texto
-        textoBoton.setAttribute('value', 'VUELVE A VER\nNUESTRA\nHISTORIA');
+        textoBoton.setAttribute(
+          'value',
+          'VUELVE A VER\nNUESTRA\nHISTORIA'
+        );
 
-        // 2. Hacer visible el contenedor
         contenedorBtn.setAttribute('visible', 'true');
-
-        // 3. REINICIO ROBUSTO DE LA ANIMACIÓN:
         contenedorBtn.setAttribute('position', '0 1.6 -15');
         contenedorBtn.removeAttribute('animation');
 
@@ -133,6 +161,8 @@
 
 </body>
 </html>
+
+
 
 
 
