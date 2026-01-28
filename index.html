@@ -62,64 +62,55 @@
     const telonNegro = document.querySelector('#telonNegro');
     const estrellasContainer = document.querySelector('#estrellas');
 
+    // --- FUNCIÓN PARA GENERAR ESTRELLAS ALEATORIAS ---
     function generarEstrellas(cantidad) {
       for (let i = 0; i < cantidad; i++) {
         let estrella = document.createElement('a-sphere');
         
+        // Posición aleatoria en una esfera de radio 50
         let theta = Math.random() * Math.PI * 2;
         let phi = Math.acos((Math.random() * 2) - 1);
-        let distBase = 45 + Math.random() * 10; // Variación inicial de distancia
+        let dist = 50; 
 
-        let x = distBase * Math.sin(phi) * Math.cos(theta);
-        let y = distBase * Math.sin(phi) * Math.sin(theta);
-        let z = distBase * Math.cos(phi);
+        let x = dist * Math.sin(phi) * Math.cos(theta);
+        let y = dist * Math.sin(phi) * Math.sin(theta);
+        let z = dist * Math.cos(phi);
 
         estrella.setAttribute('position', `${x} ${y} ${z}`);
-        estrella.setAttribute('radius', Math.random() * 0.12 + 0.03); 
-        estrella.setAttribute('material', 'color: #FFF; shader: flat; transparent: true');
+        estrella.setAttribute('radius', Math.random() * 0.15); // Tamaños variados
+        estrella.setAttribute('material', 'color: #FFF; shader: flat');
         
-        // --- 1. Animación de Brillo (Opacity) ---
-        estrella.setAttribute('animation__brillo', {
+        // Animación de parpadeo (Twinkle)
+        estrella.setAttribute('animation', {
           property: 'material.opacity',
-          from: 0.2,
+          from: Math.random(),
           to: 1,
-          dur: Math.random() * 1500 + 1000,
+          dur: Math.random() * 2000 + 1000,
           dir: 'alternate',
-          loop: true,
-          easing: 'easeInOutSine'
-        });
-
-        // --- 2. Animación de Movimiento (Acercar/Alejar) ---
-        // Calculamos un punto de destino un poco más lejos o más cerca en el mismo vector
-        let factorMovimiento = (Math.random() > 0.5 ? 1.2 : 0.8); // 20% más lejos o más cerca
-        let xDest = x * factorMovimiento;
-        let yDest = y * factorMovimiento;
-        let zDest = z * factorMovimiento;
-
-        estrella.setAttribute('animation__movimiento', {
-          property: 'position',
-          to: `${xDest} ${yDest} ${zDest}`,
-          dur: Math.random() * 5000 + 5000, // Movimiento lento y majestuoso
-          dir: 'alternate',
-          loop: true,
-          easing: 'easeInOutQuad'
+          loop: true
         });
 
         estrellasContainer.appendChild(estrella);
       }
     }
 
-    generarEstrellas(250); // Aumenté un poco la cantidad para que se note más el efecto
+    // Generamos 200 estrellas al cargar
+    generarEstrellas(200);
 
+    // --- LÓGICA DE EVENTOS ---
     btnAccion.addEventListener('click', function() {
       contenedorBtn.setAttribute('visible', 'false');
       telonNegro.emit('cineStart');
+      
+      // Mostrar estrellas con un pequeño retraso para que coincida con el fundido a negro
       setTimeout(() => {
         estrellasContainer.setAttribute('visible', 'true');
       }, 500);
+
       video.currentTime = 0;
       pantalla.setAttribute('visible', 'true');
       pantalla.emit('videoEntra');
+
       setTimeout(() => { video.play(); }, 1000);
     });
 
@@ -127,6 +118,7 @@
       telonNegro.emit('cineEnd');
       estrellasContainer.setAttribute('visible', 'false');
       pantalla.emit('videoSale');
+
       setTimeout(() => {
         pantalla.setAttribute('visible', 'false');
         contenedorBtn.setAttribute('visible', 'true');
@@ -135,6 +127,7 @@
   </script>
 </body>
 </html>
+
 
 
 
