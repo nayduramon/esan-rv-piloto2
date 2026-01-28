@@ -11,13 +11,11 @@
 
     <a-assets>
       <img id="esan360" src="gth.jpeg">
-      <video id="videoUni" src="video2.mp4" loop="false" crossorigin="anonymous" playsinline webkit-playsinline>
-      </video>
+      <video id="videoUni" src="video2.mp4" loop="false" crossorigin="anonymous" playsinline webkit-playsinline></video>
     </a-assets>
 
     <a-sky src="#esan360" rotation="0 -90 0"></a-sky>
 
-    <!-- TELÓN NEGRO -->
     <a-sphere
       id="telonNegro"
       radius="60"
@@ -26,37 +24,8 @@
       animation__aclarar="property: material.opacity; to: 0; dur: 3000; startEvents: cineEnd; easing: easeInOutQuad">
     </a-sphere>
 
-    <!-- ⭐ ESTRELLAS FUNCIONALES -->
-    <a-entity id="estrellas" visible="false">
+    <a-entity id="estrellas" visible="false"></a-entity>
 
-      <a-sphere radius="0.12" position="12 10 -35"
-        material="color: #ffffff; shader: flat"
-        animation="property: material.opacity; from: 0.2; to: 1; dur: 1200; dir: alternate; loop: true">
-      </a-sphere>
-
-      <a-sphere radius="0.08" position="-10 6 -30"
-        material="color: #ffffff; shader: flat"
-        animation="property: material.opacity; from: 0.1; to: 0.8; dur: 900; dir: alternate; loop: true">
-      </a-sphere>
-
-      <a-sphere radius="0.1" position="6 -5 -28"
-        material="color: #ffffff; shader: flat"
-        animation="property: material.opacity; from: 0.3; to: 1; dur: 1500; dir: alternate; loop: true">
-      </a-sphere>
-
-      <a-sphere radius="0.07" position="-8 -8 -26"
-        material="color: #ffffff; shader: flat"
-        animation="property: material.opacity; from: 0.2; to: 0.7; dur: 1100; dir: alternate; loop: true">
-      </a-sphere>
-
-      <a-sphere radius="0.09" position="15 -2 -32"
-        material="color: #ffffff; shader: flat"
-        animation="property: material.opacity; from: 0.2; to: 1; dur: 1800; dir: alternate; loop: true">
-      </a-sphere>
-
-    </a-entity>
-
-    <!-- VIDEO -->
     <a-video
       id="pantallaVideo"
       src="#videoUni"
@@ -68,96 +37,97 @@
       animation__salir="property: position; to: 0 1.6 -30; dur: 4000; easing: easeInQuad; startEvents: videoSale">
     </a-video>
 
-    <!-- BOTÓN -->
     <a-entity
       id="contenedorBoton"
       position="0 1.6 -15"
       visible="true"
       animation="property: position; to: 0 1.6 -2.5; dur: 8000; easing: easeOutCubic; delay: 500">
 
-      <a-circle
-        id="btnAccion"
-        class="clickable"
-        color="#000000"
-        opacity="0.6"
-        radius="0.65">
-
-        <a-text
-          id="textoBoton"
-          value="CONOCE NUESTRA\nHISTORIA"
-          align="center"
-          color="#FFFFFF"
-          width="1"
-          wrap-count="20"
-          anchor="center"
-          baseline="center">
-        </a-text>
-
+      <a-circle id="btnAccion" class="clickable" color="#000000" opacity="0.6" radius="0.65">
+        <a-text id="textoBoton" value="CONOCE NUESTRA\nHISTORIA" align="center" color="#FFFFFF" width="1" wrap-count="20"></a-text>
       </a-circle>
     </a-entity>
 
-    <!-- CÁMARA -->
     <a-entity camera look-controls position="0 1.6 0">
-      <a-cursor
-        color="#FFD700"
-        radius="0.015"
-        scale="0.3 0.3 0.3"
-        raycaster="objects: .clickable">
-      </a-cursor>
+      <a-cursor color="#FFD700" radius="0.015" scale="0.3 0.3 0.3" raycaster="objects: .clickable"></a-cursor>
     </a-entity>
 
   </a-scene>
 
-  <!-- SCRIPT -->
   <script>
     const video = document.querySelector('#videoUni');
     const pantalla = document.querySelector('#pantallaVideo');
     const contenedorBtn = document.querySelector('#contenedorBoton');
     const btnAccion = document.querySelector('#btnAccion');
-    const textoBoton = document.querySelector('#textoBoton');
     const telonNegro = document.querySelector('#telonNegro');
-    const estrellas = document.querySelector('#estrellas');
+    const estrellasContainer = document.querySelector('#estrellas');
 
-    const animacionBotonConfig =
-      "property: position; to: 0 1.6 -2.5; dur: 8000; easing: easeOutCubic; delay: 500";
+    // --- FUNCIÓN PARA GENERAR ESTRELLAS ALEATORIAS ---
+    function generarEstrellas(cantidad) {
+      for (let i = 0; i < cantidad; i++) {
+        let estrella = document.createElement('a-sphere');
+        
+        // Posición aleatoria en una esfera de radio 50
+        let theta = Math.random() * Math.PI * 2;
+        let phi = Math.acos((Math.random() * 2) - 1);
+        let dist = 50; 
 
+        let x = dist * Math.sin(phi) * Math.cos(theta);
+        let y = dist * Math.sin(phi) * Math.sin(theta);
+        let z = dist * Math.cos(phi);
+
+        estrella.setAttribute('position', `${x} ${y} ${z}`);
+        estrella.setAttribute('radius', Math.random() * 0.15); // Tamaños variados
+        estrella.setAttribute('material', 'color: #FFF; shader: flat');
+        
+        // Animación de parpadeo (Twinkle)
+        estrella.setAttribute('animation', {
+          property: 'material.opacity',
+          from: Math.random(),
+          to: 1,
+          dur: Math.random() * 2000 + 1000,
+          dir: 'alternate',
+          loop: true
+        });
+
+        estrellasContainer.appendChild(estrella);
+      }
+    }
+
+    // Generamos 200 estrellas al cargar
+    generarEstrellas(200);
+
+    // --- LÓGICA DE EVENTOS ---
     btnAccion.addEventListener('click', function() {
       contenedorBtn.setAttribute('visible', 'false');
-
       telonNegro.emit('cineStart');
-      estrellas.setAttribute('visible', 'true'); // ⭐ MOSTRAR ESTRELLAS
+      
+      // Mostrar estrellas con un pequeño retraso para que coincida con el fundido a negro
+      setTimeout(() => {
+        estrellasContainer.setAttribute('visible', 'true');
+      }, 500);
 
       video.currentTime = 0;
       pantalla.setAttribute('visible', 'true');
       pantalla.emit('videoEntra');
 
-      setTimeout(() => {
-        video.play();
-      }, 1000);
+      setTimeout(() => { video.play(); }, 1000);
     });
 
     video.addEventListener('ended', function() {
       telonNegro.emit('cineEnd');
-      estrellas.setAttribute('visible', 'false'); // ⭐ OCULTAR ESTRELLAS
-
+      estrellasContainer.setAttribute('visible', 'false');
       pantalla.emit('videoSale');
 
       setTimeout(() => {
         pantalla.setAttribute('visible', 'false');
-        textoBoton.setAttribute('value', 'VUELVE A VER\nNUESTRA\nHISTORIA');
         contenedorBtn.setAttribute('visible', 'true');
-        contenedorBtn.setAttribute('position', '0 1.6 -15');
-        contenedorBtn.removeAttribute('animation');
-
-        setTimeout(() => {
-          contenedorBtn.setAttribute('animation', animacionBotonConfig);
-        }, 50);
       }, 4000);
     });
   </script>
-
 </body>
 </html>
+
 
 
 
