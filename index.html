@@ -12,6 +12,9 @@
     <a-assets>
       <img id="esan360" src="gth.jpeg">
       <video id="videoUni" src="video2.mp4" loop="false" crossorigin="anonymous" playsinline webkit-playsinline></video>
+      <img id="galaxy1" src="https://cdn.glitch.global/c33f23a4-927b-40b4-b043-4e48b3c4377a/galaxy1.webp?v=1706404988000">
+      <img id="galaxy2" src="https://cdn.glitch.global/c33f23a4-927b-40b4-b043-4e48b3c4377a/galaxy2.webp?v=1706404988000">
+      <img id="galaxy3" src="https://cdn.glitch.global/c33f23a4-927b-40b4-b043-4e48b3c4377a/galaxy3.webp?v=1706404988000">
     </a-assets>
 
     <a-sky src="#esan360" rotation="0 -90 0"></a-sky>
@@ -25,6 +28,7 @@
     </a-sphere>
 
     <a-entity id="estrellas" visible="false"></a-entity>
+    <a-entity id="galaxiasLejanas" visible="false"></a-entity> 
 
     <a-video
       id="pantallaVideo"
@@ -61,13 +65,13 @@
     const btnAccion = document.querySelector('#btnAccion');
     const telonNegro = document.querySelector('#telonNegro');
     const estrellasContainer = document.querySelector('#estrellas');
+    const galaxiasContainer = document.querySelector('#galaxiasLejanas'); // Nuevo contenedor para galaxias
 
     // --- FUNCIÓN PARA GENERAR ESTRELLAS ALEATORIAS ---
     function generarEstrellas(cantidad) {
       for (let i = 0; i < cantidad; i++) {
         let estrella = document.createElement('a-sphere');
         
-        // Posición aleatoria en una esfera de radio 50
         let theta = Math.random() * Math.PI * 2;
         let phi = Math.acos((Math.random() * 2) - 1);
         let dist = 50; 
@@ -77,10 +81,9 @@
         let z = dist * Math.cos(phi);
 
         estrella.setAttribute('position', `${x} ${y} ${z}`);
-        estrella.setAttribute('radius', Math.random() * 0.15); // Tamaños variados
+        estrella.setAttribute('radius', Math.random() * 0.15); 
         estrella.setAttribute('material', 'color: #FFF; shader: flat');
         
-        // Animación de parpadeo (Twinkle)
         estrella.setAttribute('animation', {
           property: 'material.opacity',
           from: Math.random(),
@@ -94,17 +97,51 @@
       }
     }
 
-    // Generamos 200 estrellas al cargar
+    // --- FUNCIÓN PARA GENERAR GALAXIAS LEJANAS ---
+    function generarGalaxias(cantidad) {
+      const galaxyImages = ['#galaxy1', '#galaxy2', '#galaxy3']; // IDs de las imágenes de galaxias
+
+      for (let i = 0; i < cantidad; i++) {
+        let galaxia = document.createElement('a-sphere');
+        
+        let theta = Math.random() * Math.PI * 2;
+        let phi = Math.acos((Math.random() * 2) - 1);
+        let dist = 58; // Un poco más cerca del telón, pero detrás de las estrellas
+
+        let x = dist * Math.sin(phi) * Math.cos(theta);
+        let y = dist * Math.sin(phi) * Math.sin(theta);
+        let z = dist * Math.cos(phi);
+
+        galaxia.setAttribute('position', `${x} ${y} ${z}`);
+        galaxia.setAttribute('radius', Math.random() * 8 + 5); // Tamaños de galaxias variados, más grandes que estrellas
+        galaxia.setAttribute('material', `src: ${galaxyImages[Math.floor(Math.random() * galaxyImages.length)]}; side: front; transparent: true; opacity: ${Math.random() * 0.6 + 0.2}; shader: flat`); // Opacidad variable
+        
+        // Animación de brillo (simulando que unas brillan más que otras)
+        galaxia.setAttribute('animation', {
+            property: 'material.opacity',
+            from: Math.random() * 0.4 + 0.3, // Opacidad inicial más baja
+            to: Math.random() * 0.8 + 0.5,   // Opacidad máxima más alta
+            dur: Math.random() * 4000 + 2000, // Duración más larga para un brillo sutil
+            dir: 'alternate',
+            loop: true
+        });
+
+        galaxiasContainer.appendChild(galaxia);
+      }
+    }
+
+    // Generamos 200 estrellas y 10 galaxias al cargar
     generarEstrellas(200);
+    generarGalaxias(10); // Puedes ajustar la cantidad de galaxias
 
     // --- LÓGICA DE EVENTOS ---
     btnAccion.addEventListener('click', function() {
       contenedorBtn.setAttribute('visible', 'false');
       telonNegro.emit('cineStart');
       
-      // Mostrar estrellas con un pequeño retraso para que coincida con el fundido a negro
       setTimeout(() => {
         estrellasContainer.setAttribute('visible', 'true');
+        galaxiasContainer.setAttribute('visible', 'true'); // Mostrar galaxias también
       }, 500);
 
       video.currentTime = 0;
@@ -117,6 +154,7 @@
     video.addEventListener('ended', function() {
       telonNegro.emit('cineEnd');
       estrellasContainer.setAttribute('visible', 'false');
+      galaxiasContainer.setAttribute('visible', 'false'); // Ocultar galaxias
       pantalla.emit('videoSale');
 
       setTimeout(() => {
@@ -127,6 +165,7 @@
   </script>
 </body>
 </html>
+
 
 
 
