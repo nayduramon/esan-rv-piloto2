@@ -58,16 +58,19 @@
     const video = document.querySelector('#videoUni');
     const pantalla = document.querySelector('#pantallaVideo');
     const contenedorBtn = document.querySelector('#contenedorBoton');
+    const textoBoton = document.querySelector('#textoBoton');
     const btnAccion = document.querySelector('#btnAccion');
     const telonNegro = document.querySelector('#telonNegro');
     const estrellasContainer = document.querySelector('#estrellas');
+
+    // Guardamos la configuración de la animación de entrada para reusarla
+    const animEntrada = "property: position; to: 0 1.6 -2.5; dur: 8000; easing: easeOutCubic; delay: 500";
 
     // --- FUNCIÓN PARA GENERAR ESTRELLAS ALEATORIAS ---
     function generarEstrellas(cantidad) {
       for (let i = 0; i < cantidad; i++) {
         let estrella = document.createElement('a-sphere');
         
-        // Posición aleatoria en una esfera de radio 50
         let theta = Math.random() * Math.PI * 2;
         let phi = Math.acos((Math.random() * 2) - 1);
         let dist = 50; 
@@ -77,10 +80,9 @@
         let z = dist * Math.cos(phi);
 
         estrella.setAttribute('position', `${x} ${y} ${z}`);
-        estrella.setAttribute('radius', Math.random() * 0.15); // Tamaños variados
+        estrella.setAttribute('radius', Math.random() * 0.15); 
         estrella.setAttribute('material', 'color: #FFF; shader: flat');
         
-        // Animación de parpadeo (Twinkle)
         estrella.setAttribute('animation', {
           property: 'material.opacity',
           from: Math.random(),
@@ -94,7 +96,6 @@
       }
     }
 
-    // Generamos 200 estrellas al cargar
     generarEstrellas(500);
 
     // --- LÓGICA DE EVENTOS ---
@@ -102,7 +103,6 @@
       contenedorBtn.setAttribute('visible', 'false');
       telonNegro.emit('cineStart');
       
-      // Mostrar estrellas con un pequeño retraso para que coincida con el fundido a negro
       setTimeout(() => {
         estrellasContainer.setAttribute('visible', 'true');
       }, 500);
@@ -119,9 +119,22 @@
       estrellasContainer.setAttribute('visible', 'false');
       pantalla.emit('videoSale');
 
+      // RESET DEL BOTÓN AL FINALIZAR
       setTimeout(() => {
         pantalla.setAttribute('visible', 'false');
+        
+        // 1. Cambiamos el texto
+        textoBoton.setAttribute('value', 'VUELVE A VER\nNUESTRA\nHISTORIA');
+
+        // 2. Reposicionamos y reiniciamos la animación
+        contenedorBtn.setAttribute('position', '0 1.6 -15');
+        contenedorBtn.removeAttribute('animation');
         contenedorBtn.setAttribute('visible', 'true');
+        
+        setTimeout(() => {
+          contenedorBtn.setAttribute('animation', animEntrada);
+        }, 50);
+
       }, 4000);
     });
   </script>
