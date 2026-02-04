@@ -11,7 +11,7 @@
 
     <a-assets>
       <img id="esan360" src="gth.jpeg">
-      <video id="videoUni" src="video2.mp4" loop="false" crossorigin="anonymous" playsinline webkit-playsinline></video>
+      <video id="videoUni" src="video2.mp4" preload="auto" loop="false" crossorigin="anonymous" playsinline webkit-playsinline></video>
     </a-assets>
 
     <a-sky src="#esan360" rotation="0 -90 0"></a-sky>
@@ -58,19 +58,17 @@
     const video = document.querySelector('#videoUni');
     const pantalla = document.querySelector('#pantallaVideo');
     const contenedorBtn = document.querySelector('#contenedorBoton');
-    const textoBoton = document.querySelector('#textoBoton');
     const btnAccion = document.querySelector('#btnAccion');
+    const textoBoton = document.querySelector('#textoBoton');
     const telonNegro = document.querySelector('#telonNegro');
     const estrellasContainer = document.querySelector('#estrellas');
 
-    // Guardamos la configuración de la animación de entrada para reusarla
+    // Guardamos la animación original para reiniciarla después
     const animEntrada = "property: position; to: 0 1.6 -2.5; dur: 8000; easing: easeOutCubic; delay: 500";
 
-    // --- FUNCIÓN PARA GENERAR ESTRELLAS ALEATORIAS ---
     function generarEstrellas(cantidad) {
       for (let i = 0; i < cantidad; i++) {
         let estrella = document.createElement('a-sphere');
-        
         let theta = Math.random() * Math.PI * 2;
         let phi = Math.acos((Math.random() * 2) - 1);
         let dist = 50; 
@@ -80,7 +78,7 @@
         let z = dist * Math.cos(phi);
 
         estrella.setAttribute('position', `${x} ${y} ${z}`);
-        estrella.setAttribute('radius', Math.random() * 0.15); 
+        estrella.setAttribute('radius', Math.random() * 0.15);
         estrella.setAttribute('material', 'color: #FFF; shader: flat');
         
         estrella.setAttribute('animation', {
@@ -91,7 +89,6 @@
           dir: 'alternate',
           loop: true
         });
-
         estrellasContainer.appendChild(estrella);
       }
     }
@@ -108,10 +105,14 @@
       }, 500);
 
       video.currentTime = 0;
+      // Truco: Cargamos el video explícitamente al dar clic
+      video.load(); 
+      
       pantalla.setAttribute('visible', 'true');
       pantalla.emit('videoEntra');
 
-      setTimeout(() => { video.play(); }, 1000);
+      // Reducimos el delay para que inicie más rápido
+      setTimeout(() => { video.play(); }, 500); 
     });
 
     video.addEventListener('ended', function() {
@@ -119,22 +120,21 @@
       estrellasContainer.setAttribute('visible', 'false');
       pantalla.emit('videoSale');
 
-      // RESET DEL BOTÓN AL FINALIZAR
       setTimeout(() => {
         pantalla.setAttribute('visible', 'false');
         
-        // 1. Cambiamos el texto
+        // CAMBIO DE TEXTO
         textoBoton.setAttribute('value', 'VUELVE A VER\nNUESTRA\nHISTORIA');
-
-        // 2. Reposicionamos y reiniciamos la animación
+        
+        // REINICIO DE BOTÓN
         contenedorBtn.setAttribute('position', '0 1.6 -15');
         contenedorBtn.removeAttribute('animation');
         contenedorBtn.setAttribute('visible', 'true');
         
+        // Lanzamos la animación nuevamente
         setTimeout(() => {
           contenedorBtn.setAttribute('animation', animEntrada);
         }, 50);
-
       }, 4000);
     });
   </script>
